@@ -23,6 +23,9 @@ const ROOT_DIR = __dirname;
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const SIG_PATH = path.join(ROOT_DIR, 'signatures', 'malware_db.json');
 const CSHARP_BIN = path.join(ROOT_DIR, 'engines', 'csharp-scanner', 'bin', 'AegisScanner.exe');
+const BUNDLED_PYTHON_BIN = path.join(ROOT_DIR, 'runtime', 'python', 'python.exe');
+const PYTHON_BIN = fs.existsSync(BUNDLED_PYTHON_BIN) ? BUNDLED_PYTHON_BIN : 'python';
+const LAUNCHER_PID = Number(process.env.AEGIS_LAUNCHER_PID || 0);
 const PYTHON_SCRIPT = path.join(ROOT_DIR, 'engines', 'python-heuristics', 'analyzer.py');
 const SUPERLX_SCRIPT = path.join(ROOT_DIR, 'engines', 'superlx', 'superlx_engine.py');
 const VORTEX_DAEMON_SCRIPT = path.join(ROOT_DIR, 'vortex', 'vortex_daemon.py');
@@ -202,6 +205,7 @@ function isProtectedServicePid(pid) {
   const p = Number(pid);
   if (!p || p <= 4) return true;
   if (p === process.pid) return true;
+  if (LAUNCHER_PID && p === LAUNCHER_PID) return true;
   if (vortexProc?.pid && p === vortexProc.pid) return true;
   if (csharpProc?.pid && p === csharpProc.pid) return true;
   return false;
@@ -849,7 +853,7 @@ async function runCSharpScanner(mode, arg1 = '') {
 
 function runStreamingScan(mode = 'quickscan') {
   return new Promise((resolve, reject) => {
-    const child = spawn(CSHARP_BIN, [mode, SIG_PATH, WATCH_SANDBOX_DIR, '--stream', '--tier=pro']);
+    const child = spawn(CSHARP_BIN, [mode, SIG_PATH, WATCH_SANDBOX_DIR, '--stream', '--tier=pro'], { windowsHide: true });
     const rl = readline.createInterface({ input: child.stdout });
     let resultObj = null;
     let stderrData = '';
@@ -883,7 +887,7 @@ function runStreamingScan(mode = 'quickscan') {
 
 function runSuperLXAnalyzer(filePath, tier = 'pro') {
   return new Promise((resolve, reject) => {
-    execFile('python', [SUPERLX_SCRIPT, filePath, tier, SIG_PATH], { maxBuffer: 10 * 1024 * 1024, timeout: 25000 }, (err, stdout, stderr) => {
+    execFile(PYTHON_BIN, [SUPERLX_SCRIPT, filePath, tier, SIG_PATH], { maxBuffer: 10 * 1024 * 1024, timeout: 25000, windowsHide: true }, (err, stdout, stderr) => {
       if (err) return reject(new Error(stderr || err.message));
       try {
         resolve(JSON.parse(stdout.trim()));
@@ -896,7 +900,7 @@ function runSuperLXAnalyzer(filePath, tier = 'pro') {
 
 function runPythonAnalyzer(filePath) {
   return new Promise((resolve, reject) => {
-    execFile('python', [PYTHON_SCRIPT, filePath, SIG_PATH], { maxBuffer: 10 * 1024 * 1024, timeout: 20000 }, (err, stdout, stderr) => {
+    execFile(PYTHON_BIN, [PYTHON_SCRIPT, filePath, SIG_PATH], { maxBuffer: 10 * 1024 * 1024, timeout: 20000, windowsHide: true }, (err, stdout, stderr) => {
       if (err) return reject(new Error(stderr || err.message));
       try {
         resolve(JSON.parse(stdout.trim()));
@@ -1044,7 +1048,7 @@ const vortexPending = new Map();
 function startVortexDaemon() {
   if (shuttingDown || !fs.existsSync(VORTEX_DAEMON_SCRIPT)) return;
   try {
-    vortexProc = spawn('python', [VORTEX_DAEMON_SCRIPT, ROOT_DIR, WATCH_SANDBOX_DIR], {
+    vortexProc = spawn(PYTHON_BIN, [VORTEX_DAEMON_SCRIPT, ROOT_DIR, WATCH_SANDBOX_DIR], {
       stdio: ['pipe', 'pipe', 'pipe'],
       windowsHide: true
     });

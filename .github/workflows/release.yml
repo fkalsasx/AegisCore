@@ -1,0 +1,102 @@
+name: Build & Publish Windows Release (.exe)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v6.0.0)'
+        required: false
+        default: 'v6.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10.11'
+
+      - name: Verify Inno Setup 6
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+            Write-Error "Inno Setup 6 (ISCC.exe) not found!"
+            exit 1
+          }
+
+      - name: Run static syntax & VORTEX E2E verification
+        shell: pwsh
+        run: |
+          node --check server.js
+          node --check license_manager.js
+          node --check public/app.js
+          python -m compileall -q .
+          python vortex/tests/test_vortex_e2e.py
+
+      - name: Build Standalone Portable (.exe ZIP) & Setup.exe Installer
+        shell: pwsh
+        run: |
+          node scripts/build-package.js
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisCore-Windows-Release
+          path: |
+            dist/AegisCore-*-portable.zip
+            dist/AegisCore-*-Setup.exe
+            dist/SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}" } else { "${{ inputs.tag }}" }
+          if (-not $tag) { $tag = "v6.0.0" }
+          $notesLines = @(
+            "## AegisCore Endpoint Security ($tag)",
+            "",
+            "Windows 10/11 (64-bit) için tam bağımsız (Node.js, Python 3.10 ve .NET 8 gömülü) sürüm paketleri:",
+            "",
+            "- **AegisCore-v6.0.0-Setup.exe** — Kurulum sihirbazı (Başlat Menüsü, Masaüstü ve isteğe bağlı Windows başlangıcı kısayolları ile)",
+            "- **AegisCore-v6.0.0-win-x64-portable.zip** — Kurulumsuz taşınabilir paket (arşivden çıkarıp ``AegisCore.exe`` çalıştırın)",
+            "- **SHA256SUMS.txt** — Dosya bütünlüğü doğrulama özetleri",
+            "",
+            "### Öne Çıkanlar",
+            "- Sıfır kurulum gereksinimi: hedef bilgisayarda Node.js, Python veya .NET kurulu olması gerekmez.",
+            "- Konsol penceresiz yerel sistem tepsili ``AegisCore.exe`` masaüstü başlatıcı.",
+            "- Hafifletilmiş çekirdek bellek kullanımı (~90 MB kaynak / ~105 MB tam bağımsız çalışma seti) ve 19/19 SuperLX Anti-RAT doğrulama kapsamı."
+          )
+          $notesFile = Join-Path $env:RUNNER_TEMP "release_notes.md"
+          Set-Content -Path $notesFile -Value ($notesLines -join "`n") -Encoding UTF8
+
+          $assets = Get-ChildItem -Path dist -Include "AegisCore-*-portable.zip","AegisCore-*-Setup.exe","SHA256SUMS.txt" -Recurse | Select-Object -ExpandProperty FullName
+          if (gh release view $tag 2>$null) {
+            gh release upload $tag @assets --clobber
+          } else {
+            gh release create $tag @assets --title "AegisCore Endpoint Security $tag" --notes-file $notesFile
+          }

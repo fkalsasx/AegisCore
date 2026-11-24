@@ -1,0 +1,25 @@
+{
+  "name": "aegiscore-endpoint-security",
+  "version": "6.0.0",
+  "description": "AegisCore Endpoint Security (SuperLX 1.0 & AEGIS-VORTEX) - Zero-dependency polyglot Windows endpoint protection suite",
+  "main": "server.js",
+  "homepage": "https://github.com/fkalsasx/AegisCore",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fkalsasx/AegisCore.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "scripts": {
+    "start": "node --max-old-space-size=192 --expose-gc server.js",
+    "build:scanner": "dotnet build engines/csharp-scanner/AegisScanner.csproj -c Release -o engines/csharp-scanner/bin",
+    "build:launcher": "dotnet publish launcher/AegisCoreLauncher.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:PublishTrimmed=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist/launcher",
+    "package": "node scripts/build-package.js",
+    "package:lite": "node scripts/build-package.js --lite",
+    "test": "python vortex/tests/test_vortex_e2e.py"
+  }
+}

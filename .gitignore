@@ -17,7 +17,10 @@ licenses/
 .env
 .env.*
 
-# Build outputs (.NET, Rust, C++)
+# Build outputs & packaged distributions (.NET, Rust, C++, dist/)
+dist/
+launcher/bin/
+launcher/obj/
 engines/csharp-scanner/bin/
 engines/csharp-scanner/obj/
 vortex/rust_engine/target/

@@ -2022,9 +2022,28 @@ namespace AegisScanner
             "\\githubdesktop\\", "\\antigravity\\", "\\steam\\", "\\mozilla\\", "\\vivaldi\\"
         };
 
+        static readonly HashSet<string> s_selfTrustedBins = BuildSelfTrustedBins();
+
+        static HashSet<string> BuildSelfTrustedBins()
+        {
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                string binDir = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd('\\');
+                set.Add(Path.Combine(binDir, "aegisscanner.exe").ToLowerInvariant());
+                string rootDir = Path.GetFullPath(Path.Combine(binDir, "..", "..", "..")).TrimEnd('\\');
+                set.Add(Path.Combine(rootDir, "aegiscore.exe").ToLowerInvariant());
+                set.Add(Path.Combine(rootDir, "runtime", "node", "node.exe").ToLowerInvariant());
+                set.Add(Path.Combine(rootDir, "runtime", "python", "python.exe").ToLowerInvariant());
+            }
+            catch { }
+            return set;
+        }
+
         static (bool HighRiskDrop, bool UnsignedAppDataNonVendor) ClassifyProcessDropPath(string lowerPath)
         {
             if (string.IsNullOrEmpty(lowerPath)) return (false, false);
+            if (s_selfTrustedBins.Contains(lowerPath)) return (false, false);
             bool highRiskDrop = lowerPath.Contains("\\appdata\\local\\temp\\")
                 || lowerPath.Contains("\\users\\public\\")
                 || lowerPath.Contains("\\downloads\\")
