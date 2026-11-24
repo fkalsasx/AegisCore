@@ -1,4 +1,4 @@
-; AegisCore Endpoint Security - Inno Setup 6 Installer Script
+﻿; AegisCore Endpoint Security - Inno Setup 6 Installer Script
 #ifndef MyAppVersion
   #define MyAppVersion "6.0.0"
 #endif
