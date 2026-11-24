@@ -1,0 +1,10 @@
+[package]
+name = "aegis_vortex_rust_scanner"
+version = "1.0.0"
+edition = "2021"
+description = "AEGIS-VORTEX Module 1 High-Speed Rust Static, Fuzzy Hash, Entropy & PE IAT Engine"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

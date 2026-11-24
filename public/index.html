@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AegisCore Internet Security</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="desktop-window">
+    <!-- Klasik Masaüstü Pencere Başlık Çubuğu (McAfee / Kaspersky Çizgisi) -->
+    <header class="win-titlebar">
+      <div class="win-brand">
+        <span class="win-logo-badge" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+        </span>
+        <span class="win-title">AegisCore Security</span>
+        <span class="win-engine-tag mono" id="dockEngineBadge">SuperLX 1.0</span>
+      </div>
+
+      <!-- Alt Sayfa Geri Dönüş Yolu -->
+      <div class="win-subnav hidden" id="subpageBackBar">
+        <button class="back-home-btn" id="backToHomeBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span>Ana Sayfa</span>
+        </button>
+        <span class="subnav-sep">/</span>
+        <span class="subnav-current" id="subpageTitle">Tarama</span>
+      </div>
+
+      <div class="win-controls">
+        <label class="win-quiet-switch" title="Oyun / Sessiz Mod">
+          <input type="checkbox" id="gameModeToggle" />
+          <span>Sessiz Mod</span>
+        </label>
+
+        <div class="win-theme-pills" id="themeToggleGroup" title="Tema Seçimi">
+          <button class="theme-chip active" data-theme-choice="light">Açık</button>
+          <button class="theme-chip" data-theme-choice="dark">Koyu</button>
+        </div>
+
+        <button class="win-icon-btn" id="notificationsBtn" title="Bildirimler" aria-label="Bildirimler">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot hidden" id="notifDot"></span>
+        </button>
+
+        <button class="win-icon-btn" id="openSettingsBtn" data-tab="settings" title="Ayarlar" aria-label="Ayarlar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+
+        <div class="popover-panel hidden" id="topbarPopover">
+          <div class="popover-head" id="popoverTitle">Sistem Bildirimleri</div>
+          <div class="popover-body" id="popoverBody"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="win-content">
+      <!-- 1. ANA SAYFA (McAfee / Kaspersky Sade Klasik Düzen) -->
+      <section class="tab-view active" id="view-overview">
+        <div class="home-container">
+          <!-- Üst Koruma Durumu Bandı -->
+          <div class="hero-banner safe" id="heroStatusCard">
+            <div class="hero-left">
+              <div class="monitor-emblem" id="heroShieldEmblem" aria-hidden="true">
+                <svg width="66" height="58" viewBox="0 0 72 62" fill="none">
+                  <rect x="4" y="4" width="64" height="44" rx="5" fill="#009E60" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" id="monitorScreenRect" />
+                  <path d="M28 48h16l2 8H26l2-8z" fill="#CBD5E1" />
+                  <rect x="20" y="55" width="32" height="3" rx="1.5" fill="#94A3B8" />
+                  <path d="M27 26l6 6 12-12" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" id="monitorCheckPath" />
+                </svg>
+              </div>
+              <div class="hero-text">
+                <h1 class="hero-headline" id="heroTitle">Bilgisayarınız Güvende</h1>
+                <p class="hero-sub">
+                  <span id="heroEnginePill">SuperLX 1.0 Motoru</span> ·
+                  <span id="dbStatusText">Veritabanı Güncel</span> ·
+                  <span id="heroLastScanPill">Son Tarama: Bekleniyor</span>
+                </p>
+                <div class="hero-inline-links">
+                  <button class="btn-outline-sm" id="openEventsBtn">Ayrıntılar</button>
+                  <div class="drop-inline-pill" id="dropZone" title="Dosya sürükle-bırak veya seçerek tara">
+                    <input type="file" id="dropFileInput" class="hidden" />
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span id="dropZoneText">Hızlı Dosya İncele</span>
+                    <span class="cap-badge mono" id="dropLimitBadge">500 MB</span>
+                  </div>
+                </div>
+                <div class="hero-layers-bar">
+                  <span id="heroProtectionLayers">8/8 Koruma Katmanı Aktif: Dosya · Bellek · İndirme · Ağ/C2 · Fidye Kapanı · Öz-Koruma</span>
+                  <span class="mono" id="heroAvgSpeedPill">Analiz: ~1.2 ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-right">
+              <button class="btn-emerald-lg" id="quickScanBtn">Hızlı Tarama</button>
+              <button class="btn-light-lg" id="fullScanBtn">Tam Tarama</button>
+            </div>
+          </div>
+
+          <!-- Canlı Tarama ve Dosya Analizi Şeridi -->
+          <div class="status-strip hidden" id="inlineScanDrawer">
+            <div class="strip-top">
+              <span id="inlineScanLabel">Taranıyor...</span>
+              <span class="mono" id="inlineScanStats">0 / 0 (%0)</span>
+            </div>
+            <div class="strip-track">
+              <div class="strip-fill active-stripe" id="inlineScanProgressBar" style="width: 0%"></div>
+            </div>
+            <div class="strip-path mono" id="inlineScanFile">Hazırlanıyor...</div>
+          </div>
+
+          <div class="status-strip hidden" id="dropResultBar">
+            <div class="drop-strip-row">
+              <div id="dropResultContent" class="drop-result-inner"></div>
+              <button class="btn-outline-sm" id="closeDropResultBtn">Kapat</button>
+            </div>
+          </div>
+
+          <div class="status-strip dl-toast-strip hidden" id="liveDownloadFeedStrip">
+            <div class="drop-strip-row">
+              <div id="liveDownloadFeedContent" class="drop-result-inner"></div>
+              <div class="btn-group">
+                <button class="btn-outline-sm" id="openRealtimeFromStripBtn">Kalkan Akışı</button>
+                <button class="btn-outline-sm" id="closeLiveDownloadBtn">Kapat</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3x2 Sade Klasik Masaüstü Kart Izgarası -->
+          <div class="home-tiles-grid">
+            <button class="feature-tile" data-nav="scanner" data-title="Bilgisayar Taraması">
+              <div class="tile-icon-box">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                  <circle cx="11" cy="10" r="3" />
+                  <path d="m14.5 13.5-1.5-1.5" />
+                </svg>
+              </div>
+              <div class="tile-label">Bilgisayar Taraması</div>
+              <div class="tile-hint mono"><span id="statFilesScanned">0</span> dosya tarandı</div>
+            </button>
+
+            <button class="feature-tile" data-nav="realtime" data-title="Gerçek Zamanlı Koruma">
+              <div class="tile-icon-box tile-teal">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </div>
+              <div class="tile-label">Koruma Kalkanları</div>
+              <div class="tile-hint" id="shieldsStatusPill">Tüm Kalkanlar Aktif</div>
+            </button>
+
+            <button class="feature-tile" data-nav="firewall" data-nwtarget="nw-procs" data-title="Ağ &amp; Güvenlik Duvarı">
+              <div class="tile-icon-box">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <div class="tile-label">Güvenlik Duvarı</div>
+              <div class="tile-hint"><span class="mono" id="statThreatsBlocked">0</span> engellenen tehdit</div>
+            </button>
+
+            <button class="feature-tile" data-nav="firewall" data-nwtarget="nw-startup" data-title="Başlangıç &amp; Kalıcılık Koruması">
+              <div class="tile-icon-box">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v4" />
+                  <path d="M12 18v4" />
+                  <path d="M4.93 4.93l2.83 2.83" />
+                  <path d="M16.24 16.24l2.83 2.83" />
+                  <path d="M2 12h4" />
+                  <path d="M18 12h4" />
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+              </div>
+              <div class="tile-label">Başlangıç Koruması</div>
+              <div class="tile-hint" id="startupSummaryBadge">Kayıt Defteri ve Açılış</div>
+            </button>
+
+            <button class="feature-tile" data-nav="firewall" data-nwtarget="nw-quarantine" data-title="Karantina Kasası">
+              <div class="tile-icon-box">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <div class="tile-label">Karantina</div>
+              <div class="tile-hint mono"><span id="statQuarantineCount">0</span> izole öğe</div>
+            </button>
+
+            <button class="feature-tile" data-nav="tools" data-title="Sistem Araçları ve Testler">
+              <div class="tile-icon-box tile-teal">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                </svg>
+              </div>
+              <div class="tile-label">Sistem Araçları</div>
+              <div class="tile-hint mono" id="ramSummaryBadge">Güçlendirici ve Test</div>
+            </button>
+          </div>
+
+          <div class="home-cta-center">
+            <button class="btn-emerald-lg" id="homeOtherToolsBtn">Güvenlik Olayları ve Raporlar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. TARAMA MERKEZİ -->
+      <section class="tab-view" id="view-scanner">
+        <div class="subpage-wrap">
+          <div class="panel-card toolbar-row">
+            <div class="seg-tabs">
+              <button class="seg-tab active" data-subtab="dir-scan">Klasör ve Sistem Taraması</button>
+              <button class="seg-tab" data-subtab="pe-inspect">Derin Dosya Müfettişi</button>
+            </div>
+            <div class="btn-group">
+              <button class="btn-light-sm" id="runFullSystemScanBtn">Tam Sistem Taraması</button>
+              <button class="btn-emerald-sm" id="runWindowsQuickScanBtn">Hızlı Tarama</button>
+            </div>
+          </div>
+
+          <div class="panel-card panel-grow subtab-panel active" id="subtab-dir-scan">
+            <div class="input-row">
+              <input type="text" id="scanTargetInput" class="text-input mono" placeholder="Taranacak klasör veya dosya yolu..." />
+              <button class="btn-light-sm" id="startScanBtn">Özel Dizini Tara</button>
+            </div>
+            <div id="scanSummaryBar" class="metrics-strip metrics-strip-scan hidden">
+              <div><span class="m-k">Taranan</span><strong class="mono" id="scanTotalFiles">0</strong></div>
+              <div><span class="m-k">Süre</span><strong class="mono" id="scanDuration">0 ms</strong></div>
+              <div><span class="m-k">Hız</span><strong class="mono" id="scanSpeed">0/sn</strong></div>
+              <div><span class="m-k">Bulgular</span><strong class="mono text-danger" id="scanThreatsCount">0 Kritik</strong></div>
+              <div style="justify-content:center;align-items:flex-end;"><button class="btn-danger-sm hidden" id="quarantineAllBtn" type="button">Tüm Tehditleri Karantinaya Al</button></div>
+            </div>
+            <div class="scroll-area" id="scanResultsContainer">
+              <div class="empty-msg">Hızlı Tarama, Tam Tarama veya özel klasör seçerek taramayı başlatın.</div>
+            </div>
+          </div>
+
+          <div class="panel-card panel-grow subtab-panel" id="subtab-pe-inspect">
+            <div class="input-row">
+              <input type="text" id="deepFileInput" class="text-input mono" placeholder="Dosya yolu (Örn: C:\Windows\System32\notepad.exe)" />
+              <button class="btn-emerald-sm" id="analyzeFileBtn">Dosyayı İncele</button>
+            </div>
+            <div id="deepAnalysisResult" class="scroll-area">
+              <div class="empty-msg">Authenticode zincir doğrulaması, entropi, PE IAT ve betik çözümleme için dosya yolu girin.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. KORUMA AYARLARI -->
+      <section class="tab-view" id="view-realtime">
+        <div class="two-col">
+          <div class="panel-card col-panel">
+            <div class="panel-heading">Gerçek Zamanlı Koruma Modülleri (SuperLX 1.0)</div>
+            <div class="switch-list">
+              <label class="switch-row">
+                <div>
+                  <div class="sw-title">Gerçek Zamanlı Dosya &amp; Çalıştırma Kalkanı</div>
+                  <div class="sw-desc" id="fsShieldSub">Dosyasız komut satırı (AMSI), on-execute ve dosya değişimlerini anında durdurur</div>
+                </div>
+                <span class="toggle-clean"><input type="checkbox" id="dashToggleFs" checked /><span class="toggle-knob"></span></span>
+              </label>
+              <label class="switch-row">
+                <div>
+                  <div class="sw-title">Ağ &amp; RAT Soket Kalkanı</div>
+                  <div class="sw-desc" id="netShieldSub">Şüpheli dış bağlantıları, C2/RAT portlarını ve SMB/NTLM sızıntılarını izler</div>
+                </div>
+                <span class="toggle-clean"><input type="checkbox" id="dashToggleNet" checked /><span class="toggle-knob"></span></span>
+              </label>
+              <label class="switch-row">
+                <div>
+                  <div class="sw-title">Otomatik İndirme, Masaüstü &amp; USB Kalkanı</div>
+                  <div class="sw-desc">Tarayıcı indirmesi, MotW kaynağı, ISO/ZIP/OneNote arşivleri ve USB sürücüleri otomatik denetler</div>
+                </div>
+                <span class="toggle-clean"><input type="checkbox" id="rtToggleDownloads" checked /><span class="toggle-knob"></span></span>
+              </label>
+              <label class="switch-row">
+                <div>
+                  <div class="sw-title">Canary Fidye Yazılımı Kapanı</div>
+                  <div class="sw-desc" id="canaryShieldSub">Yem dosyalarına dokunan süreçleri anında durdurur</div>
+                </div>
+                <span class="toggle-clean"><input type="checkbox" id="dashToggleWeb" checked /><span class="toggle-knob"></span></span>
+              </label>
+              <label class="switch-row">
+                <div>
+                  <div class="sw-title">Otomatik AES-256-GCM Karantina</div>
+                  <div class="sw-desc">Kritik tehditleri otomatik karantina kasasına taşır</div>
+                </div>
+                <span class="toggle-clean"><input type="checkbox" id="rtToggleAutoQ" checked /><span class="toggle-knob"></span></span>
+              </label>
+            </div>
+            <div class="primary-shield-box" id="primaryShieldCard">
+              <div class="ps-info">
+                <div class="ps-title">Birincil Kalkan &amp; Hafiflik Durumu</div>
+                <div class="ps-meta mono" id="rtPerfBadge">-- MB RAM · ~1.2 ms Analiz</div>
+                <div class="ps-meta" id="defenderCoexistBadge">Windows Güvenliği denetleniyor...</div>
+              </div>
+              <button class="btn-light-sm" id="openWinDefenderBtn" type="button">Windows Güvenliği</button>
+            </div>
+            <div class="input-row" style="margin-top:auto;padding-top:10px;">
+              <input type="text" id="watchedPathInput" class="text-input mono" placeholder="İzlenen koruma klasörü..." />
+              <button class="btn-light-sm" id="updateWatchPathBtn">Güncelle</button>
+            </div>
+          </div>
+
+          <div class="col-panel rt-right-stack">
+            <div class="panel-card rt-feed-card">
+              <div class="panel-head-row">
+                <div>
+                  <div class="panel-heading">Otomatik İndirme Kalkanı (Canlı Akış)</div>
+                  <div class="muted-sm" id="rtDownloadStatusMeta">İndirilen tüm dosyalar tamamlanınca otomatik denetlenir</div>
+                </div>
+                <span class="pill-tag pill-blue mono" id="rtActiveDlPill">Hazır</span>
+              </div>
+              <div class="rt-zones-bar" id="rtZonesBar"></div>
+              <div class="scroll-area rt-feed-list" id="rtLiveDownloadFeed">
+                <div class="empty-msg">Henüz yeni indirme algılanmadı. İndirilenler, Masaüstü veya korunan dizinlere düşen dosyalar burada anlık listelenir.</div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-heading">Web Sitesi &amp; URL Virüs Kalkanı</div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <input type="text" id="webUrlCheckInput" class="spatial-input" placeholder="https://ornek-site.com veya şüpheli indirme bağlantısı..." style="flex:1;" />
+                <button class="btn-primary-sm" id="webUrlCheckBtn">URL Tara</button>
+              </div>
+              <div id="webUrlCheckResult" class="empty-note" style="margin-top:8px;">ClickFix, oltalama (Phishing), Punycode, doğrudan IP ve zararlı indirme kaynaklarını anında denetler.</div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-heading">Koruma Doğrulama Testleri</div>
+              <div class="verify-grid-2x2">
+                <button class="verify-tile verify-tile-compact" data-sim="dll_sim">
+                  <div>
+                    <div class="sw-title">Zararlı DLL Testi</div>
+                    <div class="sw-desc">mimilib.dll yakalama</div>
+                  </div>
+                  <span class="pill-tag pill-red">Çalıştır</span>
+                </button>
+                <button class="verify-tile verify-tile-compact" data-sim="eicar">
+                  <div>
+                    <div class="sw-title">EICAR İmza Testi</div>
+                    <div class="sw-desc">Anlık SHA-256 ve karantina</div>
+                  </div>
+                  <span class="pill-tag pill-blue">Çalıştır</span>
+                </button>
+                <button class="verify-tile verify-tile-compact" data-sim="ransom_sim">
+                  <div>
+                    <div class="sw-title">Fidye Yazılımı (.pdf.bat)</div>
+                    <div class="sw-desc">Çift uzantı koruması</div>
+                  </div>
+                  <span class="pill-tag pill-amber">Çalıştır</span>
+                </button>
+                <button class="verify-tile verify-tile-compact" data-sim="injection_sim">
+                  <div>
+                    <div class="sw-title">PowerShell Enjeksiyonu</div>
+                    <div class="sw-desc">Base64 + bellek analizi</div>
+                  </div>
+                  <span class="pill-tag pill-red">Çalıştır</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. AĞ, BAŞLANGIÇ & KARANTİNA -->
+      <section class="tab-view" id="view-firewall">
+        <div class="subpage-wrap">
+          <div class="panel-card toolbar-row">
+            <div class="seg-tabs">
+              <button class="seg-tab active" data-nwtab="nw-procs">Süreç &amp; Ağ (<span id="procCount">0</span> / <span id="netCount">0</span>)</button>
+              <button class="seg-tab" data-nwtab="nw-startup">Başlangıç RAT Denetimi</button>
+              <button class="seg-tab" data-nwtab="nw-quarantine">Karantina Kasası (<span id="quarantineBadge" class="mono">0</span>)</button>
+            </div>
+            <div class="btn-group">
+              <button class="btn-light-sm" id="refreshStartupGuardBtn">Başlangıcı Tara</button>
+              <button class="btn-light-sm" id="refreshProcNetBtn">Ağı Yenile</button>
+              <button class="btn-light-sm" id="refreshQuarantineBtn">Karantinayı Yenile</button>
+            </div>
+          </div>
+
+          <div class="nw-panel active two-col" id="nw-procs" style="flex:1;min-height:0;">
+            <div class="panel-card col-panel">
+              <div class="panel-head-row">
+                <div class="panel-heading">Çalışan Süreçler</div>
+                <div class="btn-group">
+                  <input type="text" id="procSearchInput" class="text-input text-input-sm mono" placeholder="Süreç / PID ara..." />
+                  <label class="win-quiet-switch" title="Yalnızca şüpheli süreç ve bağlantıları göster">
+                    <input type="checkbox" id="procSuspOnlyCheck" />
+                    <span>Yalnızca Şüpheliler</span>
+                  </label>
+                </div>
+              </div>
+              <div class="scroll-area" id="processTableWrap"></div>
+            </div>
+            <div class="panel-card col-panel">
+              <div class="panel-heading">Canlı TCP Soketleri &amp; RAT Portları</div>
+              <div class="scroll-area" id="networkTableWrap"></div>
+            </div>
+          </div>
+
+          <div class="panel-card panel-grow nw-panel" id="nw-startup">
+            <div class="panel-heading">Windows Başlangıç &amp; Kayıt Defteri RAT Denetimi</div>
+            <div class="scroll-area" id="startupGuardWrap">
+              <div class="empty-msg">Başlangıç kayıtları taranıyor...</div>
+            </div>
+          </div>
+
+          <div class="panel-card panel-grow nw-panel" id="nw-quarantine">
+            <div class="panel-head-row">
+              <div class="panel-heading">AES-256-GCM Şifreli Karantina Kasası</div>
+              <button class="btn-danger-sm hidden" id="purgeQuarantineBtn" type="button">Kasayı Temizle</button>
+            </div>
+            <div class="scroll-area" id="quarantineTableWrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. GÜVENLİK OLAYLARI (Ayrıntılar) -->
+      <section class="tab-view" id="view-events">
+        <div class="panel-card panel-grow active" style="display:flex;height:100%;">
+          <div class="panel-head-row">
+            <span class="panel-heading">Güvenlik Olay Günlüğü ve Raporlar</span>
+            <span class="mono muted-sm" id="eventsCountNote">Canlı Akış</span>
+          </div>
+          <div class="filter-toolbar">
+            <div class="seg-tabs" id="eventFilterTabs">
+              <button class="seg-tab active" data-evtfilter="all" type="button">Tümü</button>
+              <button class="seg-tab" data-evtfilter="critical" type="button">Kritik</button>
+              <button class="seg-tab" data-evtfilter="warning" type="button">Uyarı</button>
+              <button class="seg-tab" data-evtfilter="download" type="button">İndirme</button>
+            </div>
+            <div class="btn-group">
+              <input type="text" id="eventSearchInput" class="text-input text-input-sm mono" placeholder="Olay, yol veya hash ara..." />
+              <button class="btn-light-sm" id="exportEventsBtn" type="button">Rapor İndir (.json)</button>
+            </div>
+          </div>
+          <div class="events-cols-head">
+            <span>TARİH</span>
+            <span>OLAY</span>
+            <span>KONUM</span>
+            <span style="text-align:right;">DURUM</span>
+          </div>
+          <div class="scroll-area" id="recentActivityList">
+            <div class="empty-msg">Henüz olay kaydı bulunmuyor.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. SİSTEM ARAÇLARI & DOĞRULAMA -->
+      <section class="tab-view" id="view-tools">
+        <div class="two-col">
+          <div class="panel-card col-panel">
+            <div class="panel-head-row">
+              <span class="panel-heading">Sistem Güçlendirici ve Geri Sarma</span>
+              <span class="pill-tag pill-teal mono" id="engineActivePill">SuperLX 1.0</span>
+            </div>
+
+            <div class="metrics-strip">
+              <div><span class="m-k">Temizlenen</span><strong class="mono" id="optFreedMb">0 MB</strong></div>
+              <div><span class="m-k">Boş RAM</span><strong class="mono" id="optFreeRam">-- MB</strong></div>
+              <div><span class="m-k">Koruma Puanı</span><strong class="mono text-safe" id="optHardeningScore">99 / 100</strong></div>
+              <div><span class="m-k">CPU / Ağ</span><strong class="mono"><span id="cpuPercentText">0%</span> · <span id="netKbpsText">0 KB/s</span></strong></div>
+            </div>
+
+            <div class="input-row" style="margin:6px 0 12px;justify-content:space-between;">
+              <button class="btn-emerald-sm" id="runOptimizeBtn">Sistemi Güçlendir</button>
+              <span class="mono muted-sm" id="optimizeLastRun">Hazır</span>
+            </div>
+
+            <div class="panel-head-row" style="margin-top:6px;">
+              <span class="panel-heading">Atomik Zaman Makinesi (Geri Sarma)</span>
+              <div class="btn-group">
+                <button class="btn-light-sm" id="refreshTmBtn">Yenile</button>
+                <button class="btn-danger-sm" id="runTmRollbackBtn">Geri Sar</button>
+              </div>
+            </div>
+            <div class="scroll-area" id="timeMachineList">
+              <div class="empty-msg">Şüpheli dosya ve Kayıt Defteri değişiklikleri burada izlenir.</div>
+            </div>
+          </div>
+
+          <div class="panel-card col-panel">
+            <div class="panel-head-row">
+              <span class="panel-heading">SuperLX 1.0 Saldırı &amp; Kör Nokta Testleri</span>
+              <button class="btn-emerald-sm" id="runSuperlxBenchBtn">Testleri Çalıştır</button>
+            </div>
+            <div class="scroll-area" id="superlxBenchWrap">
+              <div class="empty-msg">SuperLX 1.0 motorunun HTML Smuggling, GZip Gizleme, AsyncRAT, Process Hollowing, LOLBin ve temiz dosya ayrım testlerini çalıştırın.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. AYARLAR -->
+      <section class="tab-view" id="view-settings">
+        <div class="two-col">
+          <div class="panel-card col-panel">
+            <div class="panel-heading">Savunma Motoru ve Görünüm</div>
+            <div class="spec-list">
+              <div class="spec-row"><span>Aktif Savunma Motoru</span><strong class="mono text-safe" id="settingsEngineName">SuperLX 1.0</strong></div>
+              <div class="spec-row"><span>Ortalama Analiz Hızı</span><strong class="mono text-safe" id="settingsAvgInspectMs">~1.2 ms (Kalıcı Çekirdek)</strong></div>
+              <div class="spec-row"><span>Çekirdek Sürümü</span><strong class="mono" id="settingsEngineVer">v6.0.0</strong></div>
+              <div class="spec-row"><span>Koruma Durumu</span><strong id="settingsZeroTrust">SuperLX 1.0 Tam Koruma</strong></div>
+              <div class="spec-row"><span>Görünüm Teması</span>
+                <div class="seg-tabs">
+                  <button class="seg-tab active" data-theme-choice="light">Açık</button>
+                  <button class="seg-tab" data-theme-choice="dark">Koyu</button>
+                </div>
+              </div>
+              <div class="spec-row"><span>Veritabanı</span><strong class="mono" id="settingsSigVer">v2026.11.17</strong></div>
+              <div class="spec-row"><span>İmza &amp; Kural Sayısı</span><strong class="mono" id="settingsSigCount">0</strong></div>
+            </div>
+          </div>
+          <div class="panel-card col-panel">
+            <div class="panel-heading">Sistem ve Donanım Bilgisi</div>
+            <div class="spec-list">
+              <div class="spec-row"><span>Bilgisayar Adı</span><strong class="mono" id="settingsHostname">-</strong></div>
+              <div class="spec-row"><span>İşletim Sistemi</span><strong class="mono" id="settingsPlatform">-</strong></div>
+              <div class="spec-row"><span>İşlemci</span><strong class="mono" id="settingsCpuCores">-</strong></div>
+              <div class="spec-row"><span>Korumalı Klasör</span><strong class="mono" id="settingsWatchPath">-</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Klasik Masaüstü Alt Durum Çubuğu -->
+    <footer class="win-footer">
+      <div class="footer-left">
+        <button class="footer-icon-btn" id="footerEventsBtn" title="Güvenlik Olayları">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          <span>Olay Günlüğü</span>
+        </button>
+        <button class="footer-icon-btn" id="footerSettingsBtn" title="Ayarlar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          <span>Ayarlar</span>
+        </button>
+      </div>
+
+      <div class="footer-right">
+        <button class="footer-link" id="footerSupportLink">Güvenlik Duvarı</button>
+        <button class="footer-link" id="footerToolsLink">Sistem Araçları</button>
+        <span class="footer-status-label" id="footerStatusLabel">Motor: SuperLX 1.0 · Güncel</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Uyumluluk için gizli yardımcı alan -->
+  <input type="checkbox" id="rtToggleFs" class="hidden" checked />
+
+  <script src="/app.js"></script>
+</body>
+</html>

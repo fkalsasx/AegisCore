@@ -1,0 +1,42 @@
+# Runtime vaults, quarantine, sandbox cages & forensic dumps (never commit)
+quarantine/
+AEGIS_Vault/
+AEGIS_ShadowStore/
+AEGIS_ShadowCage/
+realtime_protected_zone/
+licenses/
+
+# Keys, databases, logs & secrets
+*.key
+*.qvault
+*.aegis_q
+*.db
+*.sqlite
+*.sqlite3
+*.log
+.env
+.env.*
+
+# Build outputs (.NET, Rust, C++)
+engines/csharp-scanner/bin/
+engines/csharp-scanner/obj/
+vortex/rust_engine/target/
+vortex/native_cpp/build/
+*.exe
+*.dll
+*.pdb
+
+# Python & Node artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+node_modules/
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
